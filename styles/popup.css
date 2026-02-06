@@ -138,6 +138,7 @@ body {
     font-size: 20px;
     font-weight: 700;
     color: #1971c2;
+    transition: all 0.3s ease;
 }
 
 .footer {
@@ -147,7 +148,44 @@ body {
     border-top: 1px solid #e9ecef;
 }
 
-    .footer small {
+.footer small {
         color: #6c757d;
         font-size: 12px;
+}
+
+.view-steps-section {
+    padding: 0 20px 20px 20px;
+}
+
+.btn-view-steps {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 8px;
+}
+
+    .btn-view-steps:hover {
+        background: #f9fafb;
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-1px);
     }
+
+    .btn-view-steps:active {
+        transform: translateY(0);
+    }
+
+.total-steps-text {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    margin: 0;
+}
+

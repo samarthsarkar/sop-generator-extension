@@ -6,13 +6,41 @@ const statusIcon = document.getElementById('status-icon');
 const statusText = document.getElementById('status-text');
 const recordingInfo = document.getElementById('recording-info');
 const stepCount = document.getElementById('step-count');
+const viewStepsBtn = document.getElementById('view-steps-btn');
+const totalStepsText = document.getElementById('total-steps-text');
 
-// Check if recording is active
+// Update total steps count
+function updateTotalSteps() {
+    chrome.storage.local.get(['stepCount'], (result) => {
+        const count = result.stepCount || 0;
+        if (totalStepsText) {
+            totalStepsText.textContent = `${count} step${count !== 1 ? 's' : ''} saved`;
+
+            // Disable/enable button based on step count
+            if (viewStepsBtn) {
+                if (count === 0) {
+                    viewStepsBtn.style.opacity = '0.5';
+                    viewStepsBtn.style.cursor = 'not-allowed';
+                    viewStepsBtn.disabled = true;
+                } else {
+                    viewStepsBtn.style.opacity = '1';
+                    viewStepsBtn.style.cursor = 'pointer';
+                    viewStepsBtn.disabled = false;
+                }
+            }
+        }
+    });
+}
+
+// Check if recording is active on popup open
 chrome.storage.local.get(['isRecording', 'stepCount'], (result) => {
     if (result.isRecording) {
         showRecordingUI();
-        stepCount.textContent = result.stepCount || 0;
+        if (stepCount) {
+            stepCount.textContent = result.stepCount || 0;
+        }
     }
+    updateTotalSteps();
 });
 
 // Start recording
@@ -25,6 +53,7 @@ startBtn.addEventListener('click', () => {
 
     chrome.runtime.sendMessage({ action: 'startRecording' });
     showRecordingUI();
+    updateTotalSteps();
     console.log('Recording started');
 });
 
@@ -33,6 +62,7 @@ stopBtn.addEventListener('click', () => {
     chrome.storage.local.set({ isRecording: false });
     chrome.runtime.sendMessage({ action: 'stopRecording' });
     showReadyUI();
+    updateTotalSteps();
     console.log('Recording stopped');
 });
 
@@ -57,6 +87,25 @@ function showReadyUI() {
 // Listen for step updates
 chrome.runtime.onMessage.addListener((message) => {
     if (message.action === 'stepCaptured') {
-        stepCount.textContent = message.count;
+        if (stepCount) {
+            stepCount.textContent = message.count;
+
+            // Animation
+            stepCount.style.transform = 'scale(1.3)';
+            stepCount.style.color = '#4CAF50';
+            setTimeout(() => {
+                stepCount.style.transform = 'scale(1)';
+                stepCount.style.color = '#1971c2';
+            }, 300);
+        }
+
+        updateTotalSteps();
     }
 });
+
+// View steps button
+if (viewStepsBtn) {
+    viewStepsBtn.addEventListener('click', () => {
+        chrome.tabs.create({ url: chrome.runtime.getURL('viewer.html') });
+    });
+}
